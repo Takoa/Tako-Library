@@ -1,5 +1,5 @@
 Tako.Collections
- ================
+================
  
 - Left-Leaning Red-Black (2-3) Tree
     - [Robert Sedgewick. Left-leaning Red?Black Trees][1]
