@@ -102,15 +102,23 @@ namespace Tako.Collections.Single
 
         public float[] GetNearest(float[] point)
         {
+            float squareDistance;
+
+            return this.GetNearest(point, out squareDistance);
+        }
+
+        public float[] GetNearest(float[] point, out float squareDistance)
+        {
             if (point.Length != this.Dimention)
             {
                 throw new ArgumentException("point");
             }
 
             Node nearest = null;
-            float currentBestDistance = float.PositiveInfinity;
+            
+            squareDistance = float.PositiveInfinity;
 
-            this.GetNearest(point, this.root, 0, ref nearest, ref currentBestDistance);
+            this.GetNearest(point, this.root, 0, ref nearest, ref squareDistance);
 
             return nearest != null ? nearest.Value : null;
         }
@@ -192,7 +200,6 @@ namespace Tako.Collections.Single
                 return;
             }
 
-            //float distance;
             int axis = depth % this.Dimention;
             Node otherSide;
 
