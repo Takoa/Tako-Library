@@ -8,12 +8,12 @@ namespace Tako.Collections.Generic
         private const int defaultCount = 10;
 
         public MinHeap()
-            : base(null, MinHeap<T>.defaultCount, false, null)
+            : base(null, MinHeap<T>.defaultCount, true, null)
         {
         }
 
         public MinHeap(IComparer<T> comparer)
-            : base(null, MinHeap<T>.defaultCount, false, comparer)
+            : base(null, MinHeap<T>.defaultCount, true, comparer)
         {
         }
 

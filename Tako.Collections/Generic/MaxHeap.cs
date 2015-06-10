@@ -8,12 +8,12 @@ namespace Tako.Collections.Generic
         private const int defaultCount = 10;
 
         public MaxHeap()
-            : base(null, MaxHeap<T>.defaultCount, false, null)
+            : base(null, MaxHeap<T>.defaultCount, true, null)
         {
         }
 
         public MaxHeap(IComparer<T> comparer)
-            : base(null, MaxHeap<T>.defaultCount, false, comparer)
+            : base(null, MaxHeap<T>.defaultCount, true, comparer)
         {
         }
 
