@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tako.Sorting;
 using Xunit;
+
 namespace Tako.Sorting.Tests
 {
     public class MergeSortTests
     {
-        private int count = 10000;
+        private int count = 100000;
         private readonly int[] testInts;
         private Random random = new Random();
 
