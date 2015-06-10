@@ -184,9 +184,12 @@ namespace Tako.Collections.Generic
                 throw new ArgumentException();
             }
 
-            foreach (Node node in this.root)
+            if (this.root != null)
             {
-                array[index++] = new KeyValuePair<TKey,TValue>(node.Key, node.Value);
+                foreach (Node node in this.root)
+                {
+                    array[index++] = new KeyValuePair<TKey, TValue>(node.Key, node.Value);
+                } 
             }
         }
 

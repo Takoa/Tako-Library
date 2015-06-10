@@ -177,9 +177,12 @@ namespace Tako.Collections.Generic
                 throw new ArgumentException();
             }
 
-            foreach (Element element in this.root)
+            if (this.root != null)
             {
-                array[index++] = element.Item;
+                foreach (Element element in this.root)
+                {
+                    array[index++] = element.Item;
+                } 
             }
         }
 
