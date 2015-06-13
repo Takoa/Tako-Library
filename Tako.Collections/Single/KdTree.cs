@@ -20,30 +20,30 @@ namespace Tako.Collections.Single
 
         public int Count { get; private set; }
 
-        public int Dimention { get; private set; }
+        public int Dimension { get; private set; }
 
-        public KdTree(float[][] values, int dimention)
-            : this(values, dimention, true)
+        public KdTree(float[][] values, int dimension)
+            : this(values, dimension, true)
         {
         }
 
-        public KdTree(float[][] values, int dimention, bool copies)
+        public KdTree(float[][] values, int dimension, bool copies)
         {
             for (int i = 0; i < values.Length; i++)
             {
-                if (values[i].Length != dimention)
+                if (values[i].Length != dimension)
                 {
                     throw new ArgumentException("values");
                 }
             }
-            if (dimention < 0)
+            if (dimension < 0)
             {
-                throw new ArgumentOutOfRangeException("dimention");
+                throw new ArgumentOutOfRangeException("dimension");
             }
 
             float[][] valuesForBuild;
 
-            this.Dimention = dimention;
+            this.Dimension = dimension;
             this.Count = values.Length;
 
             if (copies)
@@ -109,7 +109,7 @@ namespace Tako.Collections.Single
 
         public float[] GetNearest(float[] point, out float squareDistance)
         {
-            if (point.Length != this.Dimention)
+            if (point.Length != this.Dimension)
             {
                 throw new ArgumentException("point");
             }
@@ -134,7 +134,7 @@ namespace Tako.Collections.Single
                 return null;
             }
 
-            result = new Node(this.GetMedianValue(values, startIndex, endIndex, depth % this.Dimention));
+            result = new Node(this.GetMedianValue(values, startIndex, endIndex, depth % this.Dimension));
             result.Left = this.Build(values, ++depth, startIndex, mid - 1);
             result.Right = this.Build(values, depth, mid + 1, endIndex);
 
@@ -200,7 +200,7 @@ namespace Tako.Collections.Single
                 return;
             }
 
-            int axis = depth % this.Dimention;
+            int axis = depth % this.Dimension;
             Node otherSide;
 
             if (point[axis] < node.Value[axis])
