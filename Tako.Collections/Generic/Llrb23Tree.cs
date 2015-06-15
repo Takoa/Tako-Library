@@ -222,18 +222,18 @@ namespace Tako.Collections.Generic
             return null;
         }
 
-        private void Add(ref Node to, TKey key, TValue value)
+        private void Add(ref Node node, TKey key, TValue value)
         {
             int order;
 
-            if (to == null)
+            if (node == null)
             {
-                to = new Node(key, value);  // Insert at the bottom.
+                node = new Node(key, value);  // Insert at the bottom.
 
                 return;
             }
 
-            order = this.Comparer.Compare(key, to.Key);
+            order = this.Comparer.Compare(key, node.Key);
 
             if (order == 0)
             {
@@ -241,43 +241,43 @@ namespace Tako.Collections.Generic
             }
             else if (order < 0)
             {
-                this.Add(ref to.Left, key, value);
+                this.Add(ref node.Left, key, value);
             }
             else
             {
-                this.Add(ref to.Right, key, value);
+                this.Add(ref node.Right, key, value);
             }
 
-            if (Node.IsNilOrBlack(to.Left) && Node.IsNotNilAndRed(to.Right))
+            if (Node.IsNilOrBlack(node.Left) && Node.IsNotNilAndRed(node.Right))
             {
-                Node.RotateLeft(ref to);  // Fix right-leaning reds on the way up.
+                Node.RotateLeft(ref node);  // Fix right-leaning reds on the way up.
             }
 
-            if (Node.IsNotNilAndRed(to.Left) && Node.IsNotNilAndRed(to.Left.Left))
+            if (Node.IsNotNilAndRed(node.Left) && Node.IsNotNilAndRed(node.Left.Left))
             {
-                Node.RotateRight(ref to);  // Fix two reds in a row on the way up.
+                Node.RotateRight(ref node);  // Fix two reds in a row on the way up.
             }
 
-            if (Node.IsNotNilAndRed(to.Left) && Node.IsNotNilAndRed(to.Right))
+            if (Node.IsNotNilAndRed(node.Left) && Node.IsNotNilAndRed(node.Right))
             {
-                to.FlipColor();  // Split 4-nodes on the way up.
+                node.FlipColor();  // Split 4-nodes on the way up.
             }
         }
 
-        private bool Remove(ref Node from, TKey key)
+        private bool Remove(ref Node node, TKey key)
         {
             bool succeeded;
 
-            if (this.Comparer.Compare(key, from.Key) < 0)
+            if (this.Comparer.Compare(key, node.Key) < 0)
             {
-                if (from.Left != null)
+                if (node.Left != null)
                 {
-                    if (Node.IsNilOrBlack(from.Left) && Node.IsNilOrBlack(from.Left.Left))
+                    if (Node.IsNilOrBlack(node.Left) && Node.IsNilOrBlack(node.Left.Left))
                     {
-                        Node.MoveRedLeft(ref from);  // Push red right if necessary.
+                        Node.MoveRedLeft(ref node);  // Push red right if necessary.
                     }
 
-                    succeeded = this.Remove(ref from.Left, key);  // Move down (left).
+                    succeeded = this.Remove(ref node.Left, key);  // Move down (left).
                 }
                 else
                 {
@@ -286,16 +286,16 @@ namespace Tako.Collections.Generic
             }
             else
             {
-                if (Node.IsNotNilAndRed(from.Left))
+                if (Node.IsNotNilAndRed(node.Left))
                 {
-                    Node.RotateRight(ref from);  // Rotate to push red right.
+                    Node.RotateRight(ref node);  // Rotate to push red right.
                 }
 
-                if (from.Right == null)
+                if (node.Right == null)
                 {
-                    if (this.Comparer.Compare(key, from.Key) == 0)
+                    if (this.Comparer.Compare(key, node.Key) == 0)
                     {
-                        from = null;  // Delete node.
+                        node = null;  // Delete node.
 
                         return true;
                     }
@@ -305,27 +305,27 @@ namespace Tako.Collections.Generic
                     }
                 }
 
-                if (Node.IsNilOrBlack(from.Right) && Node.IsNilOrBlack(from.Right.Left))
+                if (Node.IsNilOrBlack(node.Right) && Node.IsNilOrBlack(node.Right.Left))
                 {
-                    Node.MoveRedRight(ref from);  // Push red right if necessary.
+                    Node.MoveRedRight(ref node);  // Push red right if necessary.
                 }
 
-                if (this.Comparer.Compare(key, from.Key) == 0)
+                if (this.Comparer.Compare(key, node.Key) == 0)
                 {
-                    Node min = from.Right.GetMin();
+                    Node min = node.Right.GetMin();
 
-                    from.Key = min.Key;  // Replace current node with successor key, value.
-                    from.Value = min.Value;
-                    Node.RemoveMin(ref from.Right);  // Delete successor.
+                    node.Key = min.Key;  // Replace current node with successor key, value.
+                    node.Value = min.Value;
+                    Node.RemoveMin(ref node.Right);  // Delete successor.
                     succeeded = true;
                 }
                 else
                 {
-                    succeeded = this.Remove(ref from.Right, key);  // Move down (right).
+                    succeeded = this.Remove(ref node.Right, key);  // Move down (right).
                 }
             }
 
-            Node.FixUp(ref from);  // Fix right-leaning red links and eliminate 4-nodes on the way up.
+            Node.FixUp(ref node);  // Fix right-leaning red links and eliminate 4-nodes on the way up.
 
             return succeeded;
         }

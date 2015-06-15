@@ -226,62 +226,62 @@ namespace Tako.Collections.Generic
             return null;
         }
 
-        private void Insert(ref Element to, int index, T item)
+        private void Insert(ref Element element, int index, T item)
         {
             int leftTreeSize;
 
-            if (to == null)
+            if (element == null)
             {
-                to = new Element(item);
+                element = new Element(item);
 
                 return;
             }
 
-            leftTreeSize = to.Left != null ? to.Left.TreeSize : 0;
+            leftTreeSize = element.Left != null ? element.Left.TreeSize : 0;
 
             if (index <= leftTreeSize)
             {
-                this.Insert(ref to.Left, index, item);
+                this.Insert(ref element.Left, index, item);
             }
             else
             {
-                this.Insert(ref to.Right, index - (leftTreeSize + 1), item);
+                this.Insert(ref element.Right, index - (leftTreeSize + 1), item);
             }
 
-            to.TreeSize++;
+            element.TreeSize++;
 
-            if (Element.IsNilOrBlack(to.Left) && Element.IsNotNilAndRed(to.Right))
+            if (Element.IsNilOrBlack(element.Left) && Element.IsNotNilAndRed(element.Right))
             {
-                Element.RotateLeft(ref to);  // Fix right-leaning reds on the way up.
+                Element.RotateLeft(ref element);  // Fix right-leaning reds on the way up.
             }
 
-            if (Element.IsNotNilAndRed(to.Left) && Element.IsNotNilAndRed(to.Left.Left))
+            if (Element.IsNotNilAndRed(element.Left) && Element.IsNotNilAndRed(element.Left.Left))
             {
-                Element.RotateRight(ref to);  // Fix two reds in a row on the way up.
+                Element.RotateRight(ref element);  // Fix two reds in a row on the way up.
             }
 
-            if (Element.IsNotNilAndRed(to.Left) && Element.IsNotNilAndRed(to.Right))
+            if (Element.IsNotNilAndRed(element.Left) && Element.IsNotNilAndRed(element.Right))
             {
-                to.FlipColor();  // Split 4-elements on the way up.
+                element.FlipColor();  // Split 4-elements on the way up.
             }
         }
 
-        private bool RemoveAt(ref Element from, int index)
+        private bool RemoveAt(ref Element to, int index)
         {
             bool succeeded;
 
-            if (index < (from.Left != null ? from.Left.TreeSize : 0))
+            if (index < (to.Left != null ? to.Left.TreeSize : 0))
             {
                 // Removing will never fail if the index is always in range of the tree; thus, currently, No false-returning processes are needed.
                 //
                 //if (from.Left != null)
                 //{
-                    if (Element.IsNilOrBlack(from.Left) && Element.IsNilOrBlack(from.Left.Left))
+                    if (Element.IsNilOrBlack(to.Left) && Element.IsNilOrBlack(to.Left.Left))
                     {
-                        Element.MoveRedLeft(ref from);  // Push red right if necessary.
+                        Element.MoveRedLeft(ref to);  // Push red right if necessary.
                     }
 
-                    succeeded = this.RemoveAt(ref from.Left, index);  // Move down (left).
+                    succeeded = this.RemoveAt(ref to.Left, index);  // Move down (left).
                 //}
                 //else
                 //{
@@ -292,14 +292,14 @@ namespace Tako.Collections.Generic
             {
                 int leftTreeSize;
 
-                if (Element.IsNotNilAndRed(from.Left))
+                if (Element.IsNotNilAndRed(to.Left))
                 {
-                    Element.RotateRight(ref from);  // Rotate to push red right.
+                    Element.RotateRight(ref to);  // Rotate to push red right.
                 }
 
-                if (from.Right == null && index == (from.Left != null ? from.Left.TreeSize : 0))
+                if (to.Right == null && index == (to.Left != null ? to.Left.TreeSize : 0))
                 {
-                    from = null;  // Delete node.
+                    to = null;  // Delete node.
 
                     return true;
                 }
@@ -318,27 +318,27 @@ namespace Tako.Collections.Generic
                 //    }
                 //}
 
-                if (Element.IsNilOrBlack(from.Right) && Element.IsNilOrBlack(from.Right.Left))
+                if (Element.IsNilOrBlack(to.Right) && Element.IsNilOrBlack(to.Right.Left))
                 {
-                    Element.MoveRedRight(ref from);  // Push red right if necessary.
+                    Element.MoveRedRight(ref to);  // Push red right if necessary.
                 }
 
-                leftTreeSize = (from.Left != null ? from.Left.TreeSize : 0);
+                leftTreeSize = (to.Left != null ? to.Left.TreeSize : 0);
 
                 if (index == leftTreeSize)
                 {
-                    from.Item = from.Right.GetMin().Item;  // Replace current node with successor key, value.
-                    Element.RemoveMin(ref from.Right);  // Delete successor.
+                    to.Item = to.Right.GetMin().Item;  // Replace current node with successor key, value.
+                    Element.RemoveMin(ref to.Right);  // Delete successor.
                     succeeded = true;
                 }
                 else
                 {
-                    succeeded = this.RemoveAt(ref from.Right, index - (leftTreeSize + 1));  // Move down (right).
+                    succeeded = this.RemoveAt(ref to.Right, index - (leftTreeSize + 1));  // Move down (right).
                 }
             }
 
-            from.TreeSize--;
-            Element.FixUp(ref from);  // Fix right-leaning red links and eliminate 4-nodes on the way up.
+            to.TreeSize--;
+            Element.FixUp(ref to);  // Fix right-leaning red links and eliminate 4-nodes on the way up.
 
             return succeeded;
         }

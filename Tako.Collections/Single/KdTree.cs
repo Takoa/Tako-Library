@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tako.Collections.Single
 {
@@ -26,6 +23,7 @@ namespace Tako.Collections.Single
                 return this.root != null ? this.root.Count - this.removedNodeCount : 0;
             }
         }
+
         public int Dimension { get; private set; }
 
         public KdTree(float[][] points, int dimension)

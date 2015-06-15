@@ -216,18 +216,18 @@ namespace Tako.Collections.Generic
             return null;
         }
 
-        private void Add(ref Element to, T item)
+        private void Add(ref Element element, T item)
         {
             int order;
 
-            if (to == null)
+            if (element == null)
             {
-                to = new Element(item);  // Insert at the bottom.
+                element = new Element(item);  // Insert at the bottom.
 
                 return;
             }
 
-            order = this.Comparer.Compare(item, to.Item);
+            order = this.Comparer.Compare(item, element.Item);
 
             if (order == 0)
             {
@@ -235,47 +235,47 @@ namespace Tako.Collections.Generic
             }
             else if (order < 0)
             {
-                this.Add(ref to.Left, item);
+                this.Add(ref element.Left, item);
             }
             else
             {
-                this.Add(ref to.Right, item);
+                this.Add(ref element.Right, item);
             }
 
-            to.TreeSize++;
+            element.TreeSize++;
 
-            if (Element.IsNilOrBlack(to.Left) && Element.IsNotNilAndRed(to.Right))
+            if (Element.IsNilOrBlack(element.Left) && Element.IsNotNilAndRed(element.Right))
             {
-                Element.RotateLeft(ref to);  // Fix right-leaning reds on the way up.
+                Element.RotateLeft(ref element);  // Fix right-leaning reds on the way up.
             }
 
-            if (Element.IsNotNilAndRed(to.Left) && Element.IsNotNilAndRed(to.Left.Left))
+            if (Element.IsNotNilAndRed(element.Left) && Element.IsNotNilAndRed(element.Left.Left))
             {
-                Element.RotateRight(ref to);  // Fix two reds in a row on the way up.
+                Element.RotateRight(ref element);  // Fix two reds in a row on the way up.
             }
 
-            if (Element.IsNotNilAndRed(to.Left) && Element.IsNotNilAndRed(to.Right))
+            if (Element.IsNotNilAndRed(element.Left) && Element.IsNotNilAndRed(element.Right))
             {
-                to.FlipColor();  // Split 4-nodes on the way up.
+                element.FlipColor();  // Split 4-nodes on the way up.
             }
         }
 
-        private bool RemoveAt(ref Element from, int index)
+        private bool RemoveAt(ref Element element, int index)
         {
             bool succeeded;
 
-            if (index < (from.Left != null ? from.Left.TreeSize : 0))
+            if (index < (element.Left != null ? element.Left.TreeSize : 0))
             {
                 // Removing will never fail if the index is always in range of the tree; thus, currently, No false-returning processes are needed.
                 //
                 //if (from.Left != null)
                 //{
-                    if (Element.IsNilOrBlack(from.Left) && Element.IsNilOrBlack(from.Left.Left))
+                    if (Element.IsNilOrBlack(element.Left) && Element.IsNilOrBlack(element.Left.Left))
                     {
-                        Element.MoveRedLeft(ref from);  // Push red right if necessary.
+                        Element.MoveRedLeft(ref element);  // Push red right if necessary.
                     }
 
-                    succeeded = this.RemoveAt(ref from.Left, index);  // Move down (left).
+                    succeeded = this.RemoveAt(ref element.Left, index);  // Move down (left).
                 //}
                 //else
                 //{
@@ -286,14 +286,14 @@ namespace Tako.Collections.Generic
             {
                 int leftTreeSize;
 
-                if (Element.IsNotNilAndRed(from.Left))
+                if (Element.IsNotNilAndRed(element.Left))
                 {
-                    Element.RotateRight(ref from);  // Rotate to push red right.
+                    Element.RotateRight(ref element);  // Rotate to push red right.
                 }
 
-                if (from.Right == null && index == (from.Left != null ? from.Left.TreeSize : 0))
+                if (element.Right == null && index == (element.Left != null ? element.Left.TreeSize : 0))
                 {
-                    from = null;  // Delete node.
+                    element = null;  // Delete node.
  
                     return true;
                 }
@@ -312,27 +312,27 @@ namespace Tako.Collections.Generic
                 //    }
                 //}
 
-                if (Element.IsNilOrBlack(from.Right) && Element.IsNilOrBlack(from.Right.Left))
+                if (Element.IsNilOrBlack(element.Right) && Element.IsNilOrBlack(element.Right.Left))
                 {
-                    Element.MoveRedRight(ref from);  // Push red right if necessary.
+                    Element.MoveRedRight(ref element);  // Push red right if necessary.
                 }
 
-                leftTreeSize = (from.Left != null ? from.Left.TreeSize : 0);
+                leftTreeSize = (element.Left != null ? element.Left.TreeSize : 0);
 
                 if (index == leftTreeSize)
                 {
-                    from.Item = from.Right.GetMin().Item;  // Replace current node with successor key, value.
-                    Element.RemoveMin(ref from.Right);  // Delete successor.
+                    element.Item = element.Right.GetMin().Item;  // Replace current node with successor key, value.
+                    Element.RemoveMin(ref element.Right);  // Delete successor.
                     succeeded = true;
                 }
                 else
                 {
-                    succeeded = this.RemoveAt(ref from.Right, index - (leftTreeSize + 1));  // Move down (right).
+                    succeeded = this.RemoveAt(ref element.Right, index - (leftTreeSize + 1));  // Move down (right).
                 }
             }
 
-            from.TreeSize--;
-            Element.FixUp(ref from);  // Fix right-leaning red links and eliminate 4-nodes on the way up.
+            element.TreeSize--;
+            Element.FixUp(ref element);  // Fix right-leaning red links and eliminate 4-nodes on the way up.
 
             return succeeded;
         }
