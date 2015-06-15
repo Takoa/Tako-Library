@@ -9,6 +9,7 @@ namespace Tako.Collections.Single
     public partial class KdTree
     {
         private Node root;
+        private int removedNodeCount;
 
         public bool IsReadOnly
         {
@@ -18,22 +19,31 @@ namespace Tako.Collections.Single
             }
         }
 
-        public int Count { get; private set; }
-
+        public int Count
+        {
+            get
+            {
+                return this.root != null ? this.root.Count - this.removedNodeCount : 0;
+            }
+        }
         public int Dimension { get; private set; }
 
-        public KdTree(float[][] values, int dimension)
-            : this(values, dimension, true)
+        public KdTree(float[][] points, int dimension)
+            : this(points, dimension, true)
         {
         }
 
-        public KdTree(float[][] values, int dimension, bool copies)
+        public KdTree(float[][] points, int dimension, bool copies)
         {
-            for (int i = 0; i < values.Length; i++)
+            if (points == null)
             {
-                if (values[i].Length != dimension)
+                throw new ArgumentNullException("points");
+            }
+            for (int i = 0; i < points.Length; i++)
+            {
+                if (points[i].Length != dimension)
                 {
-                    throw new ArgumentException("values");
+                    throw new ArgumentException("points");
                 }
             }
             if (dimension < 0)
@@ -41,26 +51,76 @@ namespace Tako.Collections.Single
                 throw new ArgumentOutOfRangeException("dimension");
             }
 
-            float[][] valuesForBuild;
+            float[][] pointsForBuild;
 
             this.Dimension = dimension;
-            this.Count = values.Length;
 
             if (copies)
             {
-                valuesForBuild = new float[this.Count][];
+                pointsForBuild = new float[points.Length][];
 
-                for (int i = 0; i < valuesForBuild.Length; i++)
+                for (int i = 0; i < pointsForBuild.Length; i++)
                 {
-                    valuesForBuild[i] = values[i];
+                    pointsForBuild[i] = points[i];
                 }
             }
             else
             {
-                valuesForBuild = values;
+                pointsForBuild = points;
             }
 
-            this.root = this.Build(valuesForBuild, 0, 0, values.Length - 1);
+            this.root = this.Build(pointsForBuild, 0, 0, points.Length - 1);
+        }
+
+        public void Add(float[] point)
+        {
+            if (point.Length != this.Dimension)
+            {
+                throw new ArgumentException("point");
+            }
+
+            this.Add(ref this.root, point, 0);
+        }
+
+        public bool Remove(float[] point)
+        {
+            if (point.Length != this.Dimension)
+            {
+                throw new ArgumentException("point");
+            }
+            if (this.root == null)
+            {
+                return false;
+            }
+
+            Node nearest = null;
+            float distance = float.PositiveInfinity;
+
+            this.GetNearest(point, this.root, 0, ref nearest, ref distance);
+
+            for (int i = 0; i < point.Length; i++)
+            {
+                if (point[i] != nearest.Value[i])
+                {
+                    return false;
+                }
+            }
+
+            nearest.IsRemoved = true;
+            this.removedNodeCount++;
+
+            if (this.Count < this.removedNodeCount * 2)
+            {
+                this.Rebuild();
+            }
+
+            return true;
+        }
+
+        public void Clear()
+        {
+            this.root = null;
+            this.removedNodeCount = 0;
         }
 
         public void CopyTo(float[][] array, int index)
@@ -84,7 +144,10 @@ namespace Tako.Collections.Single
             {
                 foreach (Node node in this.root)
                 {
-                    array[index++] = node.Value;
+                    if (!node.IsRemoved)
+                    {
+                        array[index++] = node.Value;
+                    }
                 }
             }
         }
@@ -95,7 +158,10 @@ namespace Tako.Collections.Single
             {
                 foreach (Node node in this.root)
                 {
-                    yield return node.Value;
+                    if (!node.IsRemoved)
+                    {
+                        yield return node.Value;
+                    }
                 }
             }
         }
@@ -115,7 +181,7 @@ namespace Tako.Collections.Single
             }
 
             Node nearest = null;
-            
+
             squareDistance = float.PositiveInfinity;
 
             this.GetNearest(point, this.root, 0, ref nearest, ref squareDistance);
@@ -123,7 +189,61 @@ namespace Tako.Collections.Single
             return nearest != null ? nearest.Value : null;
         }
 
-        private Node Build(float[][] values, int depth, int startIndex, int endIndex)
+        public void Rebuild()
+        {
+            if (this.root == null)
+            {
+                return;
+            }
+
+            this.Rebuild(ref this.root, 0, this.Count);
+        }
+
+        private static float GetDistance(float[] point1, float[] point2)
+        {
+            float result = 0f;
+
+            for (int i = 0; i < point1.Length; i++)
+            {
+                float f = point2[i] - point1[i];
+
+                result += f * f;
+            }
+
+            return result;
+        }
+
+        private static void Swap<T>(T[] array, int index1, int index2)
+        {
+            T temp = array[index1];
+
+            array[index1] = array[index2];
+            array[index2] = temp;
+        }
+
+        private void Rebuild(ref Node node, int depth)
+        {
+            this.Rebuild(ref node, depth, node.Count);
+        }
+
+        private void Rebuild(ref Node node, int depth, int arrayLength)
+        {
+            float[][] points = new float[arrayLength][];
+            int i = 0;
+
+            foreach (Node item in node)
+            {
+                if (!item.IsRemoved)
+                {
+                    points[i++] = item.Value;
+                }
+            }
+
+            this.removedNodeCount -= node.Count - i;
+            node = this.Build(points, depth, 0, --i);
+        }
+
+        private Node Build(float[][] points, int depth, int startIndex, int endIndex)
         {
             int length = endIndex - startIndex;
             Node result;
@@ -134,21 +254,22 @@ namespace Tako.Collections.Single
                 return null;
             }
 
-            result = new Node(this.GetMedianValue(values, startIndex, endIndex, depth % this.Dimension));
-            result.Left = this.Build(values, ++depth, startIndex, mid - 1);
-            result.Right = this.Build(values, depth, mid + 1, endIndex);
+            result = new Node(this.GetMedianValue(points, startIndex, endIndex, depth % this.Dimension));
+            result.Left = this.Build(points, ++depth, startIndex, mid - 1);
+            result.Right = this.Build(points, depth, mid + 1, endIndex);
+            result.Count = endIndex - startIndex + 1;
 
             return result;
         }
 
-        private float[] GetMedianValue(float[][] values, int startIndex, int endIndex, int axis)
+        private float[] GetMedianValue(float[][] points, int startIndex, int endIndex, int axis)
         {
-            this.Quicksort(values, startIndex, endIndex, axis);
+            this.Quicksort(points, startIndex, endIndex, axis);
 
-            return values[startIndex + (endIndex - startIndex) / 2];
+            return points[startIndex + (endIndex - startIndex) / 2];
         }
 
-        private void Quicksort(float[][] values, int startIndex, int endIndex, int axis)
+        private void Quicksort(float[][] points, int startIndex, int endIndex, int axis)
         {
             int length = endIndex - startIndex;
 
@@ -158,9 +279,9 @@ namespace Tako.Collections.Single
             }
             else if (length == 1)
             {
-                if (values[endIndex][axis] < values[startIndex][axis])
+                if (points[endIndex][axis] < points[startIndex][axis])
                 {
-                    KdTree.Swap(values, startIndex, endIndex);
+                    KdTree.Swap(points, startIndex, endIndex);
                 }
             }
             else
@@ -169,28 +290,20 @@ namespace Tako.Collections.Single
 
                 for (int i = startIndex; i < endIndex; i++)
                 {
-                    if (values[i][axis] < values[endIndex][axis])
+                    if (points[i][axis] < points[endIndex][axis])
                     {
-                        KdTree.Swap(values, i, middleIndex++);
+                        KdTree.Swap(points, i, middleIndex++);
                     }
                 }
 
                 if (middleIndex != endIndex)
                 {
-                    KdTree.Swap(values, middleIndex, endIndex);
+                    KdTree.Swap(points, middleIndex, endIndex);
                 }
 
-                this.Quicksort(values, startIndex, middleIndex - 1, axis);
-                this.Quicksort(values, middleIndex + 1, endIndex, axis);
+                this.Quicksort(points, startIndex, middleIndex - 1, axis);
+                this.Quicksort(points, middleIndex + 1, endIndex, axis);
             }
-        }
-
-        private static void Swap<T>(T[] array, int index1, int index2)
-        {
-            T temp = array[index1];
-
-            array[index1] = array[index2];
-            array[index2] = temp;
         }
 
         private void GetNearest(float[] point, Node node, int depth, ref Node currentBest, ref float currentBestDistance)
@@ -216,42 +329,65 @@ namespace Tako.Collections.Single
                 otherSide = node.Left;
             }
 
-            if (currentBest == null)
+            if (!node.IsRemoved)
             {
-                currentBest = node;
-                currentBestDistance = this.GetDistance(point, node.Value);
-            }
-            else
-            {
-                float f = node.Value[axis] - currentBest.Value[axis];
-
-                if (f * f < currentBestDistance)
+                if (currentBest == null)
                 {
-                    float distance = this.GetDistance(point, node.Value);
+                    currentBest = node;
+                    currentBestDistance = KdTree.GetDistance(point, node.Value);
+                }
+                else
+                {
+                    float f = node.Value[axis] - currentBest.Value[axis];
 
-                    this.GetNearest(point, otherSide, depth, ref node, ref distance);
-
-                    if (distance < currentBestDistance)
+                    if (f * f < currentBestDistance)
                     {
-                        currentBest = node;
-                        currentBestDistance = distance;
+                        float distance = KdTree.GetDistance(point, node.Value);
+
+                        this.GetNearest(point, otherSide, depth, ref node, ref distance);
+
+                        if (distance < currentBestDistance)
+                        {
+                            currentBest = node;
+                            currentBestDistance = distance;
+                        }
                     }
                 }
             }
         }
 
-        private float GetDistance(float[] point1, float[] point2)
+        private void Add(ref Node node, float[] point, int depth)
         {
-            float result = 0f;
-
-            for (int i = 0; i < point1.Length; i++)
+            if (node == null)
             {
-                float f = point2[i] - point1[i];
+                node = new Node(point);
+                node.Count++;
 
-                result += f * f;
+                return;
             }
 
-            return result;
+            int axis = depth % this.Dimension;
+            int leftSize;
+            int rightSize;
+
+            if (point[axis] < node.Value[axis])
+            {
+                this.Add(ref node.Left, point, depth + 1);
+            }
+            else
+            {
+                this.Add(ref node.Right, point, depth + 1);
+            }
+
+            node.Count++;
+            leftSize = node.Left != null ? node.Left.Count : 0;
+            rightSize = node.Right != null ? node.Right.Count : 0;
+
+            if ((leftSize < rightSize) && (leftSize + 1) * 2 <= rightSize
+                || (rightSize < leftSize) && (rightSize + 1) * 2 < leftSize)
+            {
+                this.Rebuild(ref node, depth);
+            }
         }
     }
 }

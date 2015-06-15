@@ -13,6 +13,8 @@ namespace Tako.Collections.Single
             public float[] Value;
             public Node Left;
             public Node Right;
+            public bool IsRemoved;
+            public int Count;
 
             public Node(float[] value)
             {
