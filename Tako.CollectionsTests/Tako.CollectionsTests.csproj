@@ -59,6 +59,7 @@
     <Compile Include="Generic\MinHeapTests.cs" />
     <Compile Include="Generic\SortedLlrb23TreeListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Double\KdTreeTests.cs" />
     <Compile Include="Single\KdTreeTests.cs" />
   </ItemGroup>
   <ItemGroup>

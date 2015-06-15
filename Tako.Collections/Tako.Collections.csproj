@@ -51,6 +51,8 @@
     <Compile Include="Generic\SortedLlrb23TreeList.cs" />
     <Compile Include="Generic\SortedLlrb23TreeList.Element.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Double\KdTree.cs" />
+    <Compile Include="Double\KdTree.Node.cs" />
     <Compile Include="Single\KdTree.cs" />
     <Compile Include="Single\KdTree.Node.cs" />
   </ItemGroup>
