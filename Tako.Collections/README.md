@@ -12,7 +12,7 @@ This library contains a C# implementation of
     - A sorted version of LLRB tree list.
 - Min/Max-Heap
 - k-d Tree
-    - for single precision floating points.
+    - for single/double precision floating points.
 
 > Written with [StackEdit](http://benweet.github.io/stackedit/).
 
