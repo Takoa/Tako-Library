@@ -46,10 +46,7 @@ namespace Tako.Sorting
                     }
                 }
 
-                if (middleIndex != endIndex)
-                {
-                    QuickSort<T>.Swap(array, middleIndex, endIndex);
-                }
+                QuickSort<T>.Swap(array, middleIndex, endIndex);
 
                 this.Sort(array, startIndex, middleIndex - 1);
                 this.Sort(array, middleIndex + 1, endIndex);
@@ -58,6 +55,11 @@ namespace Tako.Sorting
 
         private static void Swap(T[] array, int index1, int index2)
         {
+            if (index1 == index2)
+            {
+                return;
+            }
+
             T temp = array[index1];
 
             array[index1] = array[index2];
