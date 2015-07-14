@@ -213,6 +213,11 @@ namespace Tako.Collections.Single
 
         private static void Swap<T>(T[] array, int index1, int index2)
         {
+            if (index1 == index2)
+            {
+                return;
+            }
+
             T temp = array[index1];
 
             array[index1] = array[index2];
@@ -294,10 +299,7 @@ namespace Tako.Collections.Single
                     }
                 }
 
-                if (middleIndex != endIndex)
-                {
-                    KdTree.Swap(points, middleIndex, endIndex);
-                }
+                KdTree.Swap(points, middleIndex, endIndex);
 
                 this.Quicksort(points, startIndex, middleIndex - 1, axis);
                 this.Quicksort(points, middleIndex + 1, endIndex, axis);

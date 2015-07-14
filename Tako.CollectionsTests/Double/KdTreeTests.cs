@@ -48,7 +48,7 @@ namespace Tako.Collections.Double.Tests
 
             for (int i = 0; i < this.count; i++)
             {
-                points[i] = new double[] { (double)this.random.NextDouble(), (double)this.random.NextDouble(), (double)this.random.NextDouble() };
+                points[i] = new double[] { this.random.NextDouble(), this.random.NextDouble(), this.random.NextDouble() };
                 kdTree.Add(points[i]);
             }
 
