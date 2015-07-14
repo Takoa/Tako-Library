@@ -4,6 +4,8 @@ namespace Tako.Sorting
 {
     public class MergeSort<T> : SortBase<T>
     {
+        private T[] temp;
+
         public MergeSort()
             : base(null)
         {
@@ -16,50 +18,39 @@ namespace Tako.Sorting
 
         public override void Sort(T[] array)
         {
-            if (array.Length == 1)
+            this.temp = new T[array.Length];
+            this.Sort(array, 0, array.Length - 1);
+        }
+
+        private void Sort(T[] array, int startIndex, int endIndex)
+        {
+            if (endIndex <= startIndex)
             {
                 return;
             }
 
-            int firstArrayLength = array.Length / 2;
-            int secondArrayLength = array.Length - firstArrayLength;
-            T[] firstArray = new T[firstArrayLength];
-            T[] secondArray = new T[secondArrayLength];
+            int mid = (startIndex + endIndex) / 2;
 
-            for (int i = 0; i < firstArrayLength; i++)
-            {
-                firstArray[i] = array[i];
-            }
-
-            for (int i = 0; i < secondArrayLength; i++)
-            {
-                secondArray[i] = array[firstArrayLength + i];
-            }
-
-            this.Sort(firstArray);
-            this.Sort(secondArray);
-            this.merge(firstArray, secondArray, array);
+            this.Sort(array, startIndex, mid);
+            this.Sort(array, mid + 1, endIndex);
+            this.merge(array, startIndex, mid, endIndex);
         }
 
-        private void merge(T[] firstArray, T[] secondArray, T[] array)
+        private void merge(T[] array, int startIndex, int mid, int endIndex)
         {
-            int i = 0;
-            int j = 0;
-            int k = 0;
-
-            for (; i < firstArray.Length && j < secondArray.Length; k++)
+            for (int i = startIndex; i <= mid; i++)
             {
-                array[k] = this.Comparer.Compare(firstArray[i], secondArray[j]) < 0 ? firstArray[i++] : secondArray[j++];
+                this.temp[i] = array[i];
             }
 
-            for (; i < firstArray.Length; i++, k++)
+            for (int i = mid + 1, j = endIndex; i <= endIndex; i++, j--)
             {
-                array[k] = firstArray[i];
+                this.temp[i] = array[j];
             }
 
-            for (; j < secondArray.Length; j++, k++)
+            for (int i = startIndex, j = startIndex, k = endIndex; i <= endIndex; i++)
             {
-                array[k] = secondArray[j];
+                array[i] = this.Comparer.Compare(this.temp[j], this.temp[k]) < 0 ? this.temp[j++] : this.temp[k--];
             }
         }
     }
