@@ -2,6 +2,7 @@ Tako.Sorting
 ============
 
 - Quick sort
+	- recursive and non recursive version
 - Merge sort
 - Heap sort
 
