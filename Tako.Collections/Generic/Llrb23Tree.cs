@@ -96,7 +96,7 @@ namespace Tako.Collections.Generic
             }
 
             this.Add(ref this.root, key, value);
-            root.IsRed = false;
+            this.root.IsRed = false;
             this.Count++;
         }
 
@@ -189,7 +189,7 @@ namespace Tako.Collections.Generic
                 foreach (Node node in this.root)
                 {
                     array[index++] = new KeyValuePair<TKey, TValue>(node.Key, node.Value);
-                } 
+                }
             }
         }
 

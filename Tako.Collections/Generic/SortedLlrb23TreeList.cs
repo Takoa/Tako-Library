@@ -62,7 +62,7 @@ namespace Tako.Collections.Generic
         public void Add(T item)
         {
             this.Add(ref this.root, item);
-            root.IsRed = false;
+            this.root.IsRed = false;
         }
 
         public bool Contains(T item)
@@ -148,7 +148,7 @@ namespace Tako.Collections.Generic
                 foreach (Element element in this.root)
                 {
                     array[index++] = element.Item;
-                } 
+                }
             }
         }
 
@@ -270,12 +270,12 @@ namespace Tako.Collections.Generic
                 //
                 //if (from.Left != null)
                 //{
-                    if (Element.IsNilOrBlack(element.Left) && Element.IsNilOrBlack(element.Left.Left))
-                    {
-                        Element.MoveRedLeft(ref element);  // Push red right if necessary.
-                    }
+                if (Element.IsNilOrBlack(element.Left) && Element.IsNilOrBlack(element.Left.Left))
+                {
+                    Element.MoveRedLeft(ref element);  // Push red right if necessary.
+                }
 
-                    succeeded = this.RemoveAt(ref element.Left, index);  // Move down (left).
+                succeeded = this.RemoveAt(ref element.Left, index);  // Move down (left).
                 //}
                 //else
                 //{
@@ -294,7 +294,7 @@ namespace Tako.Collections.Generic
                 if (element.Right == null && index == (element.Left != null ? element.Left.TreeSize : 0))
                 {
                     element = null;  // Delete node.
- 
+
                     return true;
                 }
 

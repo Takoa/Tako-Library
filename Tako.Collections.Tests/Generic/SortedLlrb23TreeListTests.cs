@@ -55,7 +55,7 @@ namespace Tako.Collections.Generic.Tests
                 Assert.Equal(item, tree[i++]);
             }
 
-            Assert.Throws<ArgumentException>(() => tree.Add(testInts[0]));
+            Assert.Throws<ArgumentException>(() => tree.Add(this.testInts[0]));
         }
 
         [Fact()]
