@@ -103,7 +103,7 @@ namespace Tako.Collections.Generic
                             {
                                 return true;
                             }
-                        } 
+                        }
                     }
                 }
 

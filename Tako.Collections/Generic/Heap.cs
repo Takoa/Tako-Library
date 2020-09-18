@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tako.Collections.Generic
 {
@@ -272,8 +269,8 @@ namespace Tako.Collections.Generic
             {
                 T temp = this.array[index];
 
-                array[index] = array[parentIndex];
-                array[parentIndex] = temp;
+                this.array[index] = this.array[parentIndex];
+                this.array[parentIndex] = temp;
 
                 this.ShiftUp(parentIndex);
             }
