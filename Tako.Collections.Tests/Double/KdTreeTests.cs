@@ -116,7 +116,7 @@ namespace Tako.Collections.Double.Tests
             kdTree.Clear();
 
             Assert.Equal(0, kdTree.Count);
-            Assert.Equal(null, kdTree.GetNearest(this.testPoints[0]));
+            Assert.Null(kdTree.GetNearest(this.testPoints[0]));
         }
 
         [Fact()]

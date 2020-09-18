@@ -94,10 +94,10 @@ namespace Tako.Collections.Generic.Tests
 
             for (int i = 0; i < this.count; i++)
             {
-                Assert.Equal(true, tree.ContainsKey(this.testInts[i]));
+                Assert.True(tree.ContainsKey(this.testInts[i]));
             }
 
-            Assert.Equal(false, tree.ContainsKey(this.count));
+            Assert.False(tree.ContainsKey(this.count));
         }
 
         [Fact()]
@@ -107,7 +107,7 @@ namespace Tako.Collections.Generic.Tests
 
             tree.Clear();
 
-            Assert.Equal(0, tree.Count);
+            Assert.Empty(tree);
 
             for (int i = 0; i < this.count; i++)
             {
@@ -123,12 +123,12 @@ namespace Tako.Collections.Generic.Tests
 
             for (int i = 0; i < this.count; i++)
             {
-                Assert.Equal(true, tree.TryGetValue(this.testInts[i], out value));
+                Assert.True(tree.TryGetValue(this.testInts[i], out value));
                 Assert.Equal(this.testStrings[i], value);
             }
 
-            Assert.Equal(false, tree.TryGetValue(-1, out value));
-            Assert.Equal(null, value);
+            Assert.False(tree.TryGetValue(-1, out value));
+            Assert.Null(value);
         }
 
         [Fact()]

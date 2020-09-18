@@ -59,10 +59,10 @@ namespace Tako.Collections.Generic.Tests
 
             for (int i = 0; i < this.count; i++)
             {
-                Assert.Equal(true, tree.Contains(this.testStrings[i]));
+                Assert.Contains(this.testStrings[i], tree);
             }
 
-            Assert.Equal(false, tree.Contains("Not Contained String"));
+            Assert.DoesNotContain("Not Contained String", tree);
         }
 
         [Fact()]
@@ -135,7 +135,7 @@ namespace Tako.Collections.Generic.Tests
 
             tree.Clear();
 
-            Assert.Equal(0, tree.Count);
+            Assert.Empty(tree);
 
             for (int i = 0; i < this.count; i++)
             {

@@ -65,10 +65,10 @@ namespace Tako.Collections.Generic.Tests
 
             foreach (int item in this.sortedSet)
             {
-                Assert.Equal(true, tree.Contains(item));
+                Assert.Contains(item, tree);
             }
 
-            Assert.Equal(false, tree.Contains(-1));
+            Assert.DoesNotContain(-1, tree);
         }
 
         [Fact()]
@@ -92,11 +92,11 @@ namespace Tako.Collections.Generic.Tests
 
             tree.Clear();
 
-            Assert.Equal(0, tree.Count);
+            Assert.Empty(tree);
 
             foreach (int item in this.sortedSet)
             {
-                Assert.Equal(false, tree.Contains(item));
+                Assert.DoesNotContain(item, tree);
             }
         }
 
@@ -218,7 +218,7 @@ namespace Tako.Collections.Generic.Tests
 
             foreach (int item in sortedSet)
             {
-                Assert.Equal(true, sortedLlrb23Tree[i] == item);
+                Assert.True(sortedLlrb23Tree[i] == item);
                 i++;
             }
         }
